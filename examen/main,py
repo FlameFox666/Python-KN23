@@ -1,0 +1,116 @@
+n = 16 
+
+# допоміжна функція — перетворючє багатоціфрове число у масив
+def numToArr(num):
+    new_num = []
+    while num > 0:
+        new_num.append(int(num) % 10)
+        num //= 10
+    new_num.reverse()
+    return new_num
+
+# задача 1 — знайдіть суму 4-значних чисел, у яких друга цифра на 2 менша за суму третьої та останньої
+def task1():
+    res = 0
+    for q in range(1000, 9999+1):
+        num = numToArr(q)
+        if num[1] + 2 == num[2] + num[len(num)-1]:
+            res += q
+    return res
+
+# задача 2 — знайдіть кількість чисел від 660 до 1400 включаючи ліву границю та включаючи праву, які діляться на (x%5)+5
+def task2(x):
+    diviter = (x%5)+5 # 7 
+    res = 0
+    for q in range(660, 1400+1):
+        if q % diviter == 0:
+            res+=1
+    return res
+
+# задача 3 — знайдіть, скільки чисел, які підходять під умову з питання 2, але НЕ діляться на (x%5)+6
+def task3(x):
+    res = 0
+    diviter = (x%5)+6
+    arr = []
+    for q in range(660, 1400+1):
+        if q % diviter != 0:
+            res+=1
+            arr.append(q)
+    return res, arr
+
+# задача 4 — починаючи з числа x+10, зробіть з ним y+100 кроків перетворень, визначенних у (а%10)+1
+#        b — найбільше чисде, яке було досягнуто в ході перетворень
+#        c — кількість кроків, у яких число зменушється
+# крок 8   — якщо число більше ніж в 100 разів за свою суму цифр, поділити число на 3 (залиши цілу частину0, інкашке помножити число на 2)
+def task4(x,y):
+    num = x+10
+    step = 0
+
+    arr = []
+    count = 0
+    while step < y+100:
+        suma = sum(numToArr(num))
+
+        # крок
+        if num * 100 == suma:
+            count += 1
+            num /= 3
+        else:
+            num *= 2
+        arr.append(num)
+        step += 1
+        #print(step, num, suma)
+    return max(arr), count
+
+# задача 5 — знайдіть суму квадратів дільників числа, що дорівнює (формула)
+def task5(n, x, y, a, b, c):
+    def getDivisors(num):
+        def prime(num):
+            prime_list = {}
+            q = 2
+            while q ** 2 <= num:
+                while num % q == 0:
+                    if q not in prime_list:
+                        prime_list[q] = 0
+                    prime_list[q] += 1
+                    num //= q
+                q += 1
+            if n > 1:
+                prime_list[num] = 1
+            return prime_list
+        
+        def gen(primes):
+            prime_list = list(primes.items())
+            div = [1]
+            
+            for prime, step in prime_list:
+                new_div = []
+                for s in range(1, step + 1):
+                    for d in div:
+                        new_div.append(d * (prime ** s))
+                div.extend(new_div)
+            
+            return sorted(set(div))
+        return gen(prime(num))
+
+    number = (n%100+100)*(x%200+200)*(y%300+300)*(a%400+400)*(b%500+500)*(c%600+600)+1
+    divisors = getDivisors(number)
+    square = [] 
+    for x in divisors:
+        square.append(x ** 2)  
+    return sum(square)
+
+x = task1()
+y = task2(x)
+a, arr = task3(x)
+b, c = task4(x,y)
+r = task5(n, x, y, a, b, c)
+
+print(
+    f"1. X = {x}\n"
+    f"2. Y = {y}\n"
+    f"3. A = {a}\n"
+    f"4. B = {b} \n"
+    f"   C = {c} \n"
+    f"5. R = {r}"
+)
